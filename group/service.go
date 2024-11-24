@@ -1,3 +1,4 @@
+// Copyright (c) Bas van Beek 2024.
 // Copyright (c) Tetrate, Inc 2023.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,7 +13,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// Package group provides a tetratelabs/run Group compatible scoped Logger
+// Package group provides a basvanbeek/run Group compatible scoped Logger
 // configuration handler.
 package group
 
@@ -20,11 +21,12 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/tetratelabs/multierror"
-	"github.com/tetratelabs/run"
+	multierror "github.com/hashicorp/go-multierror"
 
-	"github.com/tetratelabs/telemetry"
-	"github.com/tetratelabs/telemetry/scope"
+	"github.com/basvanbeek/run"
+
+	"github.com/basvanbeek/telemetry"
+	"github.com/basvanbeek/telemetry/scope"
 )
 
 const (

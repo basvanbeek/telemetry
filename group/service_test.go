@@ -1,3 +1,4 @@
+// Copyright (c) Bas van Beek 2024.
 // Copyright (c) Tetrate, Inc 2023.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -22,11 +23,12 @@ import (
 	"testing"
 
 	"github.com/tetratelabs/log"
-	"github.com/tetratelabs/run"
 
-	"github.com/tetratelabs/telemetry"
-	"github.com/tetratelabs/telemetry/group"
-	"github.com/tetratelabs/telemetry/scope"
+	"github.com/basvanbeek/run"
+
+	"github.com/basvanbeek/telemetry"
+	"github.com/basvanbeek/telemetry/group"
+	"github.com/basvanbeek/telemetry/scope"
 )
 
 func TestService(t *testing.T) {
