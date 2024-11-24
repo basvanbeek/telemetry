@@ -4,8 +4,8 @@ go 1.17
 
 require (
 	github.com/tetratelabs/log v0.2.1
-	github.com/tetratelabs/run v0.1.2
-	github.com/tetratelabs/telemetry v0.7.1
+	github.com/basvanbeek/run v0.1.2
+	github.com/basvanbeek/telemetry v0.7.1
 )
 
 require (
@@ -18,4 +18,4 @@ require (
 
 // Work around for maintaining multiple go modules in the same repository
 // until go has better support for this. https://github.com/golang/go/issues/45713
-replace github.com/tetratelabs/telemetry => ../
+replace github.com/basvanbeek/telemetry => ../
