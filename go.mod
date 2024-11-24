@@ -1,3 +1,3 @@
-module github.com/tetratelabs/telemetry
+module github.com/basvanbeek/telemetry
 
 go 1.17

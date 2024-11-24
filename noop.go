@@ -1,3 +1,4 @@
+// Copyright (c) Bas van Beek 2024.
 // Copyright (c) Tetrate, Inc 2023.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -25,12 +26,12 @@ type noopLogger struct {
 	level Level
 }
 
-func (*noopLogger) Debug(string, ...interface{})         {}
-func (*noopLogger) Info(string, ...interface{})          {}
-func (n noopLogger) Error(string, error, ...interface{}) {}
-func (n *noopLogger) SetLevel(l Level)                   { n.level = l }
-func (n *noopLogger) Level() Level                       { return n.level }
-func (n *noopLogger) With(...interface{}) Logger         { return n }
-func (n *noopLogger) Context(context.Context) Logger     { return n }
-func (n *noopLogger) Metric(Metric) Logger               { return n }
-func (n *noopLogger) Clone() Logger                      { return NoopLogger() }
+func (*noopLogger) Debug(string, ...interface{})        {}
+func (*noopLogger) Info(string, ...interface{})         {}
+func (*noopLogger) Error(string, error, ...interface{}) {}
+func (n *noopLogger) SetLevel(l Level)                  { n.level = l }
+func (n *noopLogger) Level() Level                      { return n.level }
+func (n *noopLogger) With(...interface{}) Logger        { return n }
+func (n *noopLogger) Context(context.Context) Logger    { return n }
+func (n *noopLogger) Metric(Metric) Logger              { return n }
+func (*noopLogger) Clone() Logger                       { return NoopLogger() }

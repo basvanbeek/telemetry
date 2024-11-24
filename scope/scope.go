@@ -1,3 +1,4 @@
+// Copyright (c) Bas van Beek 2024.
 // Copyright (c) Tetrate, Inc 2023.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -24,7 +25,7 @@ import (
 	"sync"
 	"sync/atomic"
 
-	"github.com/tetratelabs/telemetry"
+	"github.com/basvanbeek/telemetry"
 )
 
 var (

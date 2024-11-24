@@ -1,3 +1,4 @@
+# Copyright (c) Bas van Beek 2024.
 # Copyright (c) Tetrate, Inc 2023.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -16,7 +17,6 @@ MODULE_PATH ?= $(shell sed -ne 's/^module //gp' go.mod)
 
 # Tools
 LINTER    := github.com/golangci/golangci-lint/cmd/golangci-lint@v1.43.0
-LICENSER  := github.com/liamawhite/licenser@v0.6.1-0.20210729145742-be6c77bf6a1f
 GOIMPORTS := golang.org/x/tools/cmd/goimports@v0.1.5
 
 # List of available module subdirs.
@@ -41,7 +41,6 @@ coverage:
 	mkdir -p build
 	go test -coverprofile build/coverage.out -covermode atomic -coverpkg '$(MODULE_PATH)/...' ./...
 	go tool cover -o build/coverage.html -html build/coverage.out
-# TODO(dio): Need to provide coverage for group.
 
 LINT_CONFIG := $(dir $(abspath $(lastword $(MAKEFILE_LIST)))).golangci.yml
 LINT_OPTS ?= --timeout 5m
@@ -57,7 +56,6 @@ format:
 		mv /tmp/fmt "$$f"; \
 	done
 	go run $(GOIMPORTS) -w -local $(MODULE_PATH) $(GO_SOURCES)
-	go run $(LICENSER) apply -r "Tetrate"
 
 .PHONY: check
 check:
