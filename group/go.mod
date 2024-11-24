@@ -1,10 +1,10 @@
-module github.com/tetratelabs/telemetry/group
+module github.com/basvanbeek/telemetry/group
 
 go 1.17
 
 require (
 	github.com/tetratelabs/log v0.2.1
-	github.com/basvanbeek/run v0.0.0
+	github.com/basvanbeek/run v0.0.0-20241124130147-1d12db2b72f7
 	github.com/basvanbeek/telemetry v0.7.1
 )
 
