@@ -21,8 +21,7 @@ import (
 	"fmt"
 	"strings"
 
-	multierror "github.com/hashicorp/go-multierror"
-
+	"github.com/basvanbeek/multierror"
 	"github.com/basvanbeek/run"
 
 	"github.com/basvanbeek/telemetry"
