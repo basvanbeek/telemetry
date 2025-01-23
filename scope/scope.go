@@ -157,7 +157,7 @@ func (s *scope) With(keyValuePairs ...interface{}) telemetry.Logger {
 // Context implements telemetry.Logger.
 func (s *scope) Context(ctx context.Context) telemetry.Logger {
 	if s.logger != nil {
-		nl := s.Context(ctx)
+		nl := s.logger.Context(ctx)
 		if lCS, ok := nl.(CallerSkip); ok {
 			lCS.CSDecrease()
 		}
