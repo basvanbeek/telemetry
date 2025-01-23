@@ -4,8 +4,8 @@ go 1.17
 
 require (
 	github.com/basvanbeek/multierror v0.1.0
-	github.com/basvanbeek/run v0.1.0
-	github.com/basvanbeek/telemetry v0.1.0
+	github.com/basvanbeek/run v0.1.1
+	github.com/basvanbeek/telemetry v0.2.0
 )
 
 require (
