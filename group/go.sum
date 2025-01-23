@@ -1,7 +1,5 @@
 github.com/basvanbeek/multierror v0.1.0 h1:6migTZeJc2eCXAKDCxHajff5cFRCwchbLX3V5Lqd9js=
 github.com/basvanbeek/multierror v0.1.0/go.mod h1:fZPpiTy/Rf3NRi9GOxFgzS0s0zT/GrewfETN+B02dQw=
-github.com/basvanbeek/run v0.1.0 h1:W3/UXS7G0NZgoR8/sWgjMZ73V7z0bpArMwFw4pwHrzE=
-github.com/basvanbeek/run v0.1.0/go.mod h1:qhKplxMqZckswINATHQcTJt+3tszx3v3yBAqKNXzbyU=
 github.com/basvanbeek/run v0.1.1 h1:tcZuJZ+gMbTTxlRm5V3H59Sl7zQAgChC0kb1iidkPCE=
 github.com/basvanbeek/run v0.1.1/go.mod h1:jN7PPbIbpqa0MCxKh6RHrcisDQAXYaIntpfDwaVkZoo=
 github.com/hashicorp/errwrap v1.1.0 h1:OxrOeh75EUXMY8TBjag2fzXGZ40LB6IKw45YeGUDY2I=
