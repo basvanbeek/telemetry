@@ -63,7 +63,7 @@ func TestParallel(t *testing.T) {
 
 func TestLogger(t *testing.T) {
 	emitter := func(w io.Writer) function.Emit {
-		return func(level telemetry.Level, msg string, err error, values function.Values) {
+		return func(level telemetry.Level, msg string, err error, values function.Values, _ int) {
 			_, _ = fmt.Fprintf(w, "level=%v msg=%q", level, msg)
 			if err != nil {
 				_, _ = fmt.Fprintf(w, " err=%v", err)
@@ -105,7 +105,7 @@ func TestLogger(t *testing.T) {
 			t.Cleanup(cleanup)
 
 			var out bytes.Buffer
-			UseLogger(function.NewLogger(emitter(&out)))
+			UseLogger(function.NewLogger(emitter(&out), 0))
 
 			_ = Register(tt.name, "test logger")
 			logger, _ := Find(tt.name)
@@ -148,9 +148,9 @@ func TestSetLevel(t *testing.T) {
 func TestTwoScopes(t *testing.T) {
 	scopeA := Register("a", "Messages from a")
 	scopeB := Register("b", "Messages from b")
-	UseLogger(function.NewLogger(func(level telemetry.Level, msg string, err error, values function.Values) {
+	UseLogger(function.NewLogger(func(level telemetry.Level, msg string, err error, values function.Values, _ int) {
 		// Do nothing
-	}))
+	}, 0))
 
 	scopeA.SetLevel(telemetry.LevelDebug)
 	scopeB.SetLevel(telemetry.LevelDebug)

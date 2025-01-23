@@ -28,7 +28,7 @@ import (
 
 func TestLogger(t *testing.T) {
 	emitter := func(w io.Writer) Emit {
-		return func(level telemetry.Level, msg string, err error, values Values) {
+		return func(level telemetry.Level, msg string, err error, values Values, _ int) {
 			_, _ = fmt.Fprintf(w, "level=%v msg=%q", level, msg)
 			if err != nil {
 				_, _ = fmt.Fprintf(w, " err=%v", err)
@@ -68,7 +68,7 @@ func TestLogger(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			var out bytes.Buffer
-			logger := NewLogger(emitter(&out))
+			logger := NewLogger(emitter(&out), 0)
 
 			logger.SetLevel(tt.level)
 			if logger.Level() != tt.level {
@@ -93,7 +93,7 @@ func TestLogger(t *testing.T) {
 }
 
 func TestSetUnexpectedLevel(t *testing.T) {
-	logger := NewLogger(nil)
+	logger := NewLogger(nil, 0)
 	withvalues := logger.With("key", "value")
 	logger.SetLevel(telemetry.LevelInfo - 1)
 
@@ -103,7 +103,7 @@ func TestSetUnexpectedLevel(t *testing.T) {
 }
 
 func TestClone(t *testing.T) {
-	logger := NewLogger(nil)
+	logger := NewLogger(nil, 0)
 
 	// Enhancing a logger with values does not alter the logger itself, and setting hte level should
 	// affect the enhanced logger and the original one. We're not altering the 'scope' here.
