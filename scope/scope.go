@@ -57,6 +57,11 @@ type Scope interface {
 	Description() string
 }
 
+type CallerSkip interface {
+	CSIncrease()
+	CSDecrease()
+}
+
 var _ Scope = (*scope)(nil)
 
 // scope provides scoped logging functionality.
@@ -84,6 +89,7 @@ func (s *scope) Description() string {
 func (s *scope) Debug(msg string, keyValuePairs ...interface{}) {
 	if s.logger != nil {
 		s.logger.Debug(msg, keyValuePairs...)
+		return
 	}
 	if PanicOnUninitialized {
 		panic("calling Debug on uninitialized logger")
@@ -94,6 +100,7 @@ func (s *scope) Debug(msg string, keyValuePairs ...interface{}) {
 func (s *scope) Info(msg string, keyValuePairs ...interface{}) {
 	if s.logger != nil {
 		s.logger.Info(msg, keyValuePairs...)
+		return
 	}
 	if PanicOnUninitialized {
 		panic("calling Info on uninitialized logger")
@@ -104,6 +111,7 @@ func (s *scope) Info(msg string, keyValuePairs ...interface{}) {
 func (s *scope) Error(msg string, err error, keyValuePairs ...interface{}) {
 	if s.logger != nil {
 		s.logger.Error(msg, err, keyValuePairs...)
+		return
 	}
 	if PanicOnUninitialized {
 		panic("calling Error on uninitialized logger")
@@ -119,7 +127,11 @@ func (s *scope) With(keyValuePairs ...interface{}) telemetry.Logger {
 		keyValuePairs = append(keyValuePairs, "(MISSING)")
 	}
 	if s.logger != nil {
-		return s.logger.With(keyValuePairs...)
+		nl := s.logger.With(keyValuePairs...)
+		if lCS, ok := nl.(CallerSkip); ok {
+			lCS.CSDecrease()
+		}
+		return nl
 	}
 	sc := &scope{
 		name:        s.name,
@@ -145,7 +157,11 @@ func (s *scope) With(keyValuePairs ...interface{}) telemetry.Logger {
 // Context implements telemetry.Logger.
 func (s *scope) Context(ctx context.Context) telemetry.Logger {
 	if s.logger != nil {
-		return s.logger.Context(ctx)
+		nl := s.Context(ctx)
+		if lCS, ok := nl.(CallerSkip); ok {
+			lCS.CSDecrease()
+		}
+		return nl
 	}
 
 	sc := s.Clone()
@@ -159,7 +175,11 @@ func (s *scope) Context(ctx context.Context) telemetry.Logger {
 // Metric implements telemetry.Logger.
 func (s *scope) Metric(m telemetry.Metric) telemetry.Logger {
 	if s.logger != nil {
-		return s.logger.Metric(m)
+		nl := s.logger.Metric(m)
+		if lCS, ok := nl.(CallerSkip); ok {
+			lCS.CSDecrease()
+		}
+		return nl
 	}
 
 	sc := s.Clone()
@@ -382,6 +402,9 @@ func UseLogger(logger telemetry.Logger) {
 	// adjust already registered scopes
 	for _, scopes := range uninitialized {
 		l := defaultLogger.Clone()
+		if lCS, ok := l.(CallerSkip); ok {
+			lCS.CSIncrease()
+		}
 		for _, sc := range scopes {
 			if sc.ctx != nil {
 				l = l.Context(sc.ctx)
