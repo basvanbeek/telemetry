@@ -34,7 +34,7 @@ var levelToString = map[Level]string{
 	LevelDebug: "debug",
 }
 
-// levelToString maps string representations to the corresponding level
+// levelToString maps string representations to the corresponding level.
 var stringToLevel = map[string]Level{
 	"none":  LevelNone,
 	"error": LevelError,

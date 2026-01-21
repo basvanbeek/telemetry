@@ -16,7 +16,7 @@
 MODULE_PATH ?= $(shell sed -ne 's/^module //gp' go.mod)
 
 # Tools
-GOLANGCI_LINT_VERSION := v2.4.2
+GOLANGCI_LINT_VERSION := v2.8.0
 GOIMPORTS := golang.org/x/tools/cmd/goimports@v0.29.0
 
 # Binaries

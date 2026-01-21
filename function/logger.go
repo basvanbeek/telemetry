@@ -74,14 +74,16 @@ func NewLogger(emitFunc Emit, callerSkip int) telemetry.Logger {
 		ctx:        context.Background(),
 		level:      &lvl,
 		emitFunc:   emitFunc,
-		callerSkip: int32(callerSkip),
+		callerSkip: int32(callerSkip), //nolint:gosec // ignore gosec suggestion
 	}
 }
 
+// CSIncrease increases the caller skip count by 1.
 func (l *Logger) CSIncrease() {
 	atomic.AddInt32(&l.callerSkip, 1)
 }
 
+// CSDecrease decreases the caller skip count by 1.
 func (l *Logger) CSDecrease() {
 	atomic.AddInt32(&l.callerSkip, -1)
 }
@@ -198,7 +200,7 @@ func (l *Logger) Metric(m telemetry.Metric) telemetry.Logger {
 	return newLoggerWithValues(l.ctx, m, l.level, l.emitFunc, l.args, l.callerSkip)
 }
 
-// Clone the current Logger and return it
+// Clone the current Logger and return it.
 func (l *Logger) Clone() telemetry.Logger {
 	// When cloning the logger, we don't want both logger to share a level.
 	// We need to dereference the pointer and set the level properly.

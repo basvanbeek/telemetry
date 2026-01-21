@@ -57,6 +57,8 @@ type Scope interface {
 	Description() string
 }
 
+// CallerSkip interface can be implemented by loggers to adjust the caller
+// skip level when used in a scope.
 type CallerSkip interface {
 	CSIncrease()
 	CSDecrease()
@@ -75,12 +77,12 @@ type scope struct {
 	level       *int32
 }
 
-// Name of the logging scope
+// Name of the logging scope.
 func (s *scope) Name() string {
 	return s.name
 }
 
-// Description of the logging scope
+// Description of the logging scope.
 func (s *scope) Description() string {
 	return s.description
 }
@@ -283,7 +285,7 @@ func Find(name string) (Scope, bool) {
 	return s, ok
 }
 
-// List all registered Scopes
+// List all registered Scopes.
 func List() map[string]Scope {
 	lock.Lock()
 	defer lock.Unlock()
@@ -375,7 +377,7 @@ func DefaultLevel() telemetry.Level {
 	return defaultLevel()
 }
 
-func defaultLevel() telemetry.Level {
+func defaultLevel() telemetry.Level { //nolint:revive // internal function
 	if defaultLogger != nil {
 		return defaultLogger.Level()
 	}
