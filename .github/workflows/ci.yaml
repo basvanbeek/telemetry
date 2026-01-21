@@ -21,7 +21,7 @@ on: [push, pull_request]
 
 env:
   GOPROXY: https://proxy.golang.org
-  GOVERSION: 1.17.2     # must match go.mod
+  GOVERSION: 1.24     # must match go.mod
 
 jobs:
   sanity:

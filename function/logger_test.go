@@ -34,7 +34,7 @@ func TestLogger(t *testing.T) {
 				_, _ = fmt.Fprintf(w, " err=%v", err)
 			}
 
-			all := append(values.FromContext, values.FromLogger...)
+			all := append(values.FromContext, values.FromLogger...) //nolint:gocritic // ignore gocritic suggestion
 			all = append(all, values.FromMethod...)
 			_, _ = fmt.Fprintf(w, " %v", all)
 		}

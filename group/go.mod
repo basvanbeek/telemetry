@@ -1,6 +1,6 @@
 module github.com/basvanbeek/telemetry/group
 
-go 1.17
+go 1.24
 
 require (
 	github.com/basvanbeek/multierror v0.1.0

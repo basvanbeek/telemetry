@@ -29,7 +29,7 @@ import (
 	"github.com/basvanbeek/telemetry/function"
 )
 
-func TestParallel(t *testing.T) {
+func TestParallel(_ *testing.T) {
 	logger := Register("root", "root scope")
 	ctx := context.Background()
 	wg := sync.WaitGroup{}
@@ -69,7 +69,7 @@ func TestLogger(t *testing.T) {
 				_, _ = fmt.Fprintf(w, " err=%v", err)
 			}
 
-			all := append(values.FromContext, values.FromLogger...)
+			all := append(values.FromContext, values.FromLogger...) //nolint:gocritic // ignore gocritic suggestion
 			all = append(all, values.FromMethod...)
 			_, _ = fmt.Fprintf(w, " %v", all)
 		}
@@ -148,7 +148,7 @@ func TestSetLevel(t *testing.T) {
 func TestTwoScopes(t *testing.T) {
 	scopeA := Register("a", "Messages from a")
 	scopeB := Register("b", "Messages from b")
-	UseLogger(function.NewLogger(func(level telemetry.Level, msg string, err error, values function.Values, _ int) {
+	UseLogger(function.NewLogger(func(_ telemetry.Level, _ string, _ error, _ function.Values, _ int) {
 		// Do nothing
 	}, 0))
 
