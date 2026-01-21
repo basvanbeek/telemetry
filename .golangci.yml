@@ -1,4 +1,4 @@
-# Copyright (c) Bas van Beek 2024.
+# Copyright (c) Bas van Beek 2024-2026.
 # Copyright (c) Tetrate, Inc 2023.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,37 +12,30 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+version: "2"
 linters:
   enable:
     - contextcheck
-    - deadcode
     - errcheck
     - errname
     - goconst
-    - gosimple
     - govet
     - ineffassign
     - lll
-    - megacheck
     - misspell
     - prealloc
     - revive
     - staticcheck
-    - structcheck
-    - tenv
     - unconvert
     - unused
-    - varcheck
-  disable:
-    - interfacer # deprecated since it "is prone to bad suggestions"
-    - goimports # already run in `make format`
 linters-settings:
   lll:
     line-length: 160
   goconst:
     min-occurrences: 4
   govet:
-    check-shadowing: true
+    enable:
+      - shadow
   revive:
     ignore-generated-header: false
     severity: error
