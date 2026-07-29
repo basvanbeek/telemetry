@@ -17,5 +17,8 @@
 // A common integration pattern is to use a scoped logger:
 //
 //	libScope := scope.Register("mylib", "mylib's slog messages")
-//	myLib.SetLoggingDefault(slog.New(bridgedslog.NewHandler(libScope)))
+//	myLib.SetLoggingDefault(slog.New(bridgedslog.NewHandlerWithCallerSkipDelta(libScope, 4)))
+//
+// NewHandler uses a default caller skip delta of 3. If your slog integration
+// adds extra wrapper frames, use NewHandlerWithCallerSkipDelta to override it.
 package slog

@@ -212,20 +212,26 @@ func TestCallerSourceMatchesDirectLoggerCall(t *testing.T) {
 		bridgedLine = line
 	}, 3)
 
-	logDirect(directLogger)
-	logViaSlog(stdslog.New(NewHandler(bridgedTarget)))
+	wantDirectLine := logDirect(directLogger)
+	wantBridgedLine := logViaSlog(stdslog.New(NewHandler(bridgedTarget)))
 
 	if !strings.HasSuffix(directFile, "/bridges/slog/handler_test.go") {
 		t.Fatalf("expected direct caller to resolve to test file, got %q", directFile)
 	}
 	if bridgedFile != directFile {
 		t.Fatalf(
-			"expected bridged caller %q:%d to match direct caller %q:%d",
+			"expected bridged caller file %q:%d to match direct caller file %q:%d",
 			bridgedFile,
 			bridgedLine,
 			directFile,
 			directLine,
 		)
+	}
+	if directLine != wantDirectLine {
+		t.Fatalf("expected direct line %d to match logger.Error call line %d", directLine, wantDirectLine)
+	}
+	if bridgedLine != wantBridgedLine {
+		t.Fatalf("expected bridged line %d to match slog.Error call line %d", bridgedLine, wantBridgedLine)
 	}
 }
 
@@ -258,29 +264,66 @@ func TestCallerSourceMatchesScopedLoggerCall(t *testing.T) {
 	}, 3))
 	scopedLogger.SetLevel(telemetry.LevelDebug)
 
-	logDirect(scopedLogger)
-	logViaSlog(stdslog.New(NewHandler(scopedLogger)))
+	wantDirectLine := logDirect(scopedLogger)
+	wantBridgedLine := logViaSlog(stdslog.New(NewHandler(scopedLogger)))
 
 	if !strings.HasSuffix(directFile, "/bridges/slog/handler_test.go") {
 		t.Fatalf("expected scoped direct caller to resolve to test file, got %q", directFile)
 	}
 	if bridgedFile != directFile {
 		t.Fatalf(
-			"expected scoped bridged caller %q:%d to match direct caller %q:%d",
+			"expected scoped bridged caller file %q:%d to match direct caller file %q:%d",
 			bridgedFile,
 			bridgedLine,
 			directFile,
 			directLine,
 		)
 	}
+	if directLine != wantDirectLine {
+		t.Fatalf("expected scoped direct line %d to match logger.Error call line %d", directLine, wantDirectLine)
+	}
+	if bridgedLine != wantBridgedLine {
+		t.Fatalf("expected scoped bridged line %d to match slog.Error call line %d", bridgedLine, wantBridgedLine)
+	}
 }
 
-func logDirect(logger telemetry.Logger) {
+func TestCallerSourceWithWrappedSlogCallAndCustomDelta(t *testing.T) {
+	var bridgedLine int
+
+	bridgedTarget := function.NewLogger(func(_ telemetry.Level, _ string, _ error, _ function.Values, callerSkip int) {
+		_, _, line, ok := runtime.Caller(callerSkip)
+		if !ok {
+			t.Fatal("runtime.Caller failed for wrapped bridged logger")
+		}
+		bridgedLine = line
+	}, 3)
+
+	expectedLine := logViaSlogWrapped(stdslog.New(NewHandlerWithCallerSkipDelta(bridgedTarget, 4)))
+	if bridgedLine != expectedLine {
+		t.Fatalf("expected wrapped bridged line %d to match wrapper caller line %d", bridgedLine, expectedLine)
+	}
+}
+
+func logDirect(logger telemetry.Logger) int {
+	_, _, line, _ := runtime.Caller(0)
 	logger.Error("direct call", nil)
+	return line + 1
 }
 
-func logViaSlog(logger *stdslog.Logger) {
+func logViaSlog(logger *stdslog.Logger) int {
+	_, _, line, _ := runtime.Caller(0)
 	logger.Error("bridged call")
+	return line + 1
+}
+
+func logViaSlogWrapped(logger *stdslog.Logger) int {
+	_, _, line, _ := runtime.Caller(0)
+	logViaSlogInnerWrapper(logger)
+	return line + 1
+}
+
+func logViaSlogInnerWrapper(logger *stdslog.Logger) {
+	logger.Error("wrapped bridged call")
 }
 
 func (l *loggerSpy) entries() []logEntry {
