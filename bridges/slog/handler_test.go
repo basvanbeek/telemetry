@@ -18,11 +18,16 @@ import (
 	"context"
 	"errors"
 	stdslog "log/slog"
+	"path/filepath"
 	"reflect"
+	"runtime"
+	"strings"
 	"sync"
 	"testing"
 
 	"github.com/basvanbeek/telemetry"
+	"github.com/basvanbeek/telemetry/function"
+	"github.com/basvanbeek/telemetry/scope"
 )
 
 type logEntry struct {
@@ -180,6 +185,102 @@ func TestDebugRespectsEnabledLevel(t *testing.T) {
 	if got := len(spy.entries()); got != 0 {
 		t.Fatalf("expected no entries, got %d", got)
 	}
+}
+
+func TestCallerSourceMatchesDirectLoggerCall(t *testing.T) {
+	var (
+		directFile  string
+		directLine  int
+		bridgedFile string
+		bridgedLine int
+	)
+
+	directLogger := function.NewLogger(func(_ telemetry.Level, _ string, _ error, _ function.Values, callerSkip int) {
+		_, file, line, ok := runtime.Caller(callerSkip)
+		if !ok {
+			t.Fatal("runtime.Caller failed for direct logger")
+		}
+		directFile = filepath.ToSlash(file)
+		directLine = line
+	}, 3)
+	bridgedTarget := function.NewLogger(func(_ telemetry.Level, _ string, _ error, _ function.Values, callerSkip int) {
+		_, file, line, ok := runtime.Caller(callerSkip)
+		if !ok {
+			t.Fatal("runtime.Caller failed for bridged logger")
+		}
+		bridgedFile = filepath.ToSlash(file)
+		bridgedLine = line
+	}, 3)
+
+	logDirect(directLogger)
+	logViaSlog(stdslog.New(NewHandler(bridgedTarget)))
+
+	if !strings.HasSuffix(directFile, "/bridges/slog/handler_test.go") {
+		t.Fatalf("expected direct caller to resolve to test file, got %q", directFile)
+	}
+	if bridgedFile != directFile {
+		t.Fatalf(
+			"expected bridged caller %q:%d to match direct caller %q:%d",
+			bridgedFile,
+			bridgedLine,
+			directFile,
+			directLine,
+		)
+	}
+}
+
+func TestCallerSourceMatchesScopedLoggerCall(t *testing.T) {
+	var (
+		directFile  string
+		directLine  int
+		bridgedFile string
+		bridgedLine int
+	)
+
+	scopedLogger := scope.Register("bridge-slog-direct-telemetry", "test scope for slog bridge callsite")
+	if scopedLogger == nil {
+		t.Fatal("failed to register test scope")
+	}
+
+	scope.UseLogger(function.NewLogger(func(_ telemetry.Level, msg string, _ error, _ function.Values, callerSkip int) {
+		_, file, line, ok := runtime.Caller(callerSkip)
+		if !ok {
+			t.Fatal("runtime.Caller failed for scoped logger")
+		}
+		switch msg {
+		case "direct call":
+			directFile = filepath.ToSlash(file)
+			directLine = line
+		case "bridged call":
+			bridgedFile = filepath.ToSlash(file)
+			bridgedLine = line
+		}
+	}, 3))
+	scopedLogger.SetLevel(telemetry.LevelDebug)
+
+	logDirect(scopedLogger)
+	logViaSlog(stdslog.New(NewHandler(scopedLogger)))
+
+	if !strings.HasSuffix(directFile, "/bridges/slog/handler_test.go") {
+		t.Fatalf("expected scoped direct caller to resolve to test file, got %q", directFile)
+	}
+	if bridgedFile != directFile {
+		t.Fatalf(
+			"expected scoped bridged caller %q:%d to match direct caller %q:%d",
+			bridgedFile,
+			bridgedLine,
+			directFile,
+			directLine,
+		)
+	}
+}
+
+func logDirect(logger telemetry.Logger) {
+	logger.Error("direct call", nil)
+}
+
+func logViaSlog(logger *stdslog.Logger) {
+	logger.Error("bridged call")
 }
 
 func (l *loggerSpy) entries() []logEntry {
