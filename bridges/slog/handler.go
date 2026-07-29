@@ -24,23 +24,37 @@ import (
 
 // Handler forwards slog records to a telemetry.Logger.
 type Handler struct {
-	logger telemetry.Logger
-	attrs  []stdslog.Attr
-	groups []string
+	logger          telemetry.Logger
+	attrs           []stdslog.Attr
+	groups          []string
+	callerSkipDelta int
 }
 
 type callerSkipper interface {
 	CSIncrease()
 }
 
-const bridgeCallerSkipDelta = 3
+const defaultBridgeCallerSkipDelta = 3
 
 // NewHandler creates a slog.Handler backed by telemetry.Logger.
 func NewHandler(logger telemetry.Logger) *Handler {
+	return NewHandlerWithCallerSkipDelta(logger, defaultBridgeCallerSkipDelta)
+}
+
+// NewHandlerWithCallerSkipDelta creates a slog.Handler backed by telemetry.Logger
+// and applies the provided caller skip delta when the logger supports caller
+// skipping.
+func NewHandlerWithCallerSkipDelta(logger telemetry.Logger, callerSkipDelta int) *Handler {
 	if logger == nil {
 		logger = telemetry.NoopLogger()
 	}
-	return &Handler{logger: logger}
+	if callerSkipDelta < 0 {
+		callerSkipDelta = 0
+	}
+	return &Handler{
+		logger:          logger,
+		callerSkipDelta: callerSkipDelta,
+	}
 }
 
 // Enabled reports whether the telemetry logger should emit this slog level.
@@ -62,7 +76,7 @@ func (h *Handler) Handle(ctx context.Context, record stdslog.Record) error {
 	}
 	if _, ok := logger.(callerSkipper); ok {
 		logger = logger.Clone()
-		for i := 0; i < bridgeCallerSkipDelta; i++ {
+		for i := 0; i < h.callerSkipDelta; i++ {
 			logger.(callerSkipper).CSIncrease()
 		}
 	}
