@@ -29,6 +29,12 @@ type Handler struct {
 	groups []string
 }
 
+type callerSkipper interface {
+	CSIncrease()
+}
+
+const bridgeCallerSkipDelta = 3
+
 // NewHandler creates a slog.Handler backed by telemetry.Logger.
 func NewHandler(logger telemetry.Logger) *Handler {
 	if logger == nil {
@@ -53,6 +59,12 @@ func (h *Handler) Handle(ctx context.Context, record stdslog.Record) error {
 	}
 	if ctx != nil {
 		logger = logger.Context(ctx)
+	}
+	if _, ok := logger.(callerSkipper); ok {
+		logger = logger.Clone()
+		for i := 0; i < bridgeCallerSkipDelta; i++ {
+			logger.(callerSkipper).CSIncrease()
+		}
 	}
 
 	var (
