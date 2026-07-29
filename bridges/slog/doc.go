@@ -14,8 +14,8 @@
 
 // Package slog bridges standard library slog handlers to telemetry.Logger.
 //
-// A common integration pattern with lego:
+// A common integration pattern is to use a scoped logger:
 //
-//	legoScope := scope.Register("lego", "lego ACME library")
-//	legoLog.SetDefault(slog.New(telemetryslog.NewHandler(legoScope)))
+//	libScope := scope.Register("mylib", "mylib's slog messages")
+//	myLib.SetLoggingDefault(slog.New(bridgedslog.NewHandler(libScope)))
 package slog
